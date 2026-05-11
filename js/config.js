@@ -34,7 +34,7 @@ const CONFIG = {
     SCOPES_READONLY: 'https://www.googleapis.com/auth/spreadsheets.readonly',
 
     // Guest page URL (update after deploying to GitHub Pages)
-    GUEST_PAGE_URL: 'https://YOUR_GITHUB_USERNAME.github.io/SeatAssigner/guest.html',
+    GUEST_PAGE_URL: 'https://gondor98.github.io/SeatAssigner/guest.html',
 
     // App Settings
     APP: {
