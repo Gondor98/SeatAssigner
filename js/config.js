@@ -1,24 +1,17 @@
 /**
  * Configuration for Google Sheets API
- * 
- * SETUP INSTRUCTIONS:
- * 1. Go to https://console.cloud.google.com
- * 2. Create project "WeddingSeatAssigner"
- * 3. Enable "Google Sheets API"
- * 4. Create an API Key (for read access)
- * 5. Create OAuth 2.0 Client ID (for write access from admin)
- * 6. Fill in the values below
+ * Wedding Seat Assigner - Production Config
  */
 
 const CONFIG = {
-    // Google Sheets API Key (read-only, restricted to your domains)
-    API_KEY: 'YOUR_API_KEY_HERE',
+    // Google Sheets API Key (read-only)
+    API_KEY: 'AIzaSyDK9uhwncly_1aSwsKtgqADS53xEsMjqQQ',
 
-    // Google Sheet ID (from the URL: https://docs.google.com/spreadsheets/d/SHEET_ID/edit)
-    SPREADSHEET_ID: 'YOUR_SPREADSHEET_ID_HERE',
+    // Google Sheet ID
+    SPREADSHEET_ID: '1KFPGKPi2ebYJ58RWXNZchtrWyWPmlxbs1OepzGACsUo',
 
     // OAuth 2.0 Client ID (for admin write operations)
-    CLIENT_ID: 'YOUR_CLIENT_ID_HERE',
+    CLIENT_ID: '917388633534-fbc96ceit3nc36dpi9hf6ro0196884qi.apps.googleusercontent.com',
 
     // Sheet names
     SHEETS: {
@@ -33,7 +26,7 @@ const CONFIG = {
     SCOPES: 'https://www.googleapis.com/auth/spreadsheets',
     SCOPES_READONLY: 'https://www.googleapis.com/auth/spreadsheets.readonly',
 
-    // Guest page URL (update after deploying to GitHub Pages)
+    // Guest page URL (GitHub Pages)
     GUEST_PAGE_URL: 'https://gondor98.github.io/SeatAssigner/guest.html',
 
     // App Settings
