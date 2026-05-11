@@ -16,7 +16,8 @@ const CONFIG = {
     // Sheet names
     SHEETS: {
         GUEST_LIST: 'GuestList',
-        TABLE_CONFIG: 'TableConfig'
+        TABLE_CONFIG: 'TableConfig',
+        CHECK_IN: 'CheckIn'
     },
 
     // Discovery doc for Sheets API

@@ -14,45 +14,74 @@
     </header>
 
     <div class="guest-search-container">
-        <div class="guest-welcome">
-            <h1>Xin chào quý khách!</h1>
-            <p>Vui lòng nhập tên để tìm bàn tiệc của bạn</p>
-        </div>
-
-        <div class="search-box">
-            <div class="search-input-wrapper">
-                <input
-                    type="text"
-                    id="name-input"
-                    class="search-input"
-                    placeholder="Nhập họ tên..."
-                    autocomplete="off"
-                    autofocus
-                >
-                <button class="search-btn" id="search-btn">🔍</button>
+        <!-- Step 1: Name Search -->
+        <div id="step-search" class="guest-step">
+            <div class="guest-welcome">
+                <h1>Xin chào quý khách!</h1>
+                <p>Vui lòng nhập tên để tìm bàn tiệc của bạn</p>
             </div>
 
-            <!-- Suggestions -->
-            <ul class="suggestions-list" id="suggestions" style="display: none;"></ul>
+            <div class="search-box">
+                <div class="search-input-wrapper">
+                    <input
+                        type="text"
+                        id="name-input"
+                        class="search-input"
+                        placeholder="Nhập họ tên..."
+                        autocomplete="off"
+                        autofocus
+                    >
+                    <button class="search-btn" id="search-btn">🔍</button>
+                </div>
+                <ul class="suggestions-list" id="suggestions" style="display: none;"></ul>
+            </div>
+        </div>
+
+        <!-- Step 2: Confirm Party Size -->
+        <div id="step-party-size" class="guest-step" style="display: none;">
+            <div class="card" style="text-align: center; max-width: 400px; margin: 0 auto;">
+                <p class="result-name" id="checkin-name" style="margin-bottom: 0.5rem;"></p>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    Số người đăng ký: <strong id="expected-size"></strong>
+                </p>
+                <div class="form-group" style="text-align: left;">
+                    <label for="actual-size-input">Số người thực tế đến hôm nay:</label>
+                    <input type="number" id="actual-size-input" class="form-control" 
+                           min="1" max="20" style="text-align: center; font-size: 1.3rem; font-weight: 600;">
+                </div>
+                <button class="btn-primary" id="confirm-size-btn" style="width: 100%; justify-content: center; margin-top: 1rem;">
+                    ✓ Xác nhận
+                </button>
+            </div>
         </div>
 
         <!-- Loading -->
         <div class="spinner" id="loading-spinner"></div>
 
-        <!-- Result -->
-        <div class="result-container" id="result-container">
-            <div class="result-card">
-                <p class="result-name" id="result-name"></p>
-                <p class="result-table-number" id="result-table-number"></p>
-                <p class="result-table-label">Số bàn của bạn</p>
+        <!-- Step 3: Result -->
+        <div id="step-result" class="guest-step" style="display: none;">
+            <div class="result-container visible">
+                <div class="result-card">
+                    <p class="result-name" id="result-name"></p>
+                    <p class="result-table-number" id="result-table-number"></p>
+                    <p class="result-table-label">Số bàn của bạn</p>
 
-                <!-- Mini Table Map -->
-                <div id="guest-table-map" style="margin-top: 1rem;"></div>
+                    <!-- Reassignment notice -->
+                    <div id="reassignment-notice" style="display: none; margin-bottom: 1rem;">
+                        <div class="status-message status-info" style="font-size: 0.85rem; text-align: left;">
+                            <strong>📋 Đã tối ưu chỗ ngồi:</strong>
+                            <span id="reassignment-text"></span>
+                        </div>
+                    </div>
+
+                    <!-- Mini Table Map -->
+                    <div id="guest-table-map" style="margin-top: 1rem;"></div>
+                </div>
             </div>
         </div>
 
         <!-- Not Found -->
-        <div class="result-container" id="not-found-container">
+        <div id="step-not-found" class="guest-step" style="display: none;">
             <div class="card" style="text-align: center;">
                 <p style="font-size: 2rem; margin-bottom: 0.5rem;">😔</p>
                 <p style="color: var(--text-secondary);">
@@ -67,10 +96,11 @@
     </div>
 
     <!-- Libraries -->
-    <script src="js/config.js"></script>
-    <script src="js/sheets-api.js"></script>
-    <script src="js/name-matcher.js"></script>
-    <script src="js/table-renderer.js"></script>
-    <script src="js/guest.js"></script>
+    <script src="js/config.js?v=3"></script>
+    <script src="js/sheets-api.js?v=3"></script>
+    <script src="js/name-matcher.js?v=3"></script>
+    <script src="js/table-renderer.js?v=3"></script>
+    <script src="js/dynamic-assigner.js?v=2"></script>
+    <script src="js/guest.js?v=4"></script>
 </body>
 </html>
