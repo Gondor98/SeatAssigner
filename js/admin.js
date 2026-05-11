@@ -1,6 +1,6 @@
 /**
  * Admin Page Logic
- * Handles: Excel upload, table config, push to sheets, QR generation
+ * Handles: Excel upload, table config, overflow check, push to sheets, QR generation
  */
 
 (function() {
@@ -40,17 +40,14 @@
 
     // ============ FILE UPLOAD ============
 
-    // Click to upload
     fileDropArea.addEventListener('click', () => fileInput.click());
 
-    // File selected
     fileInput.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
             handleFile(e.target.files[0]);
         }
     });
 
-    // Drag & Drop
     fileDropArea.addEventListener('dragover', (e) => {
         e.preventDefault();
         fileDropArea.classList.add('dragover');
@@ -84,6 +81,9 @@
 
                 parseExcelData(jsonData);
                 showStatus(uploadStatus, 'success', `✅ Đã tải file "${file.name}" thành công!`);
+                
+                // Run overflow check after upload
+                runOverflowCheck();
             } catch (err) {
                 console.error(err);
                 showStatus(uploadStatus, 'error', `❌ Lỗi đọc file: ${err.message}`);
@@ -98,7 +98,6 @@
             return;
         }
 
-        // Skip header row, parse data
         guestData = data.slice(1)
             .filter(row => row[0] && String(row[0]).trim().length > 0)
             .map((row, idx) => ({
@@ -128,6 +127,62 @@
 
         dataPreview.style.display = 'block';
     }
+
+    // ============ OVERFLOW CHECK ============
+
+    function runOverflowCheck() {
+        const maxPerTable = parseInt(maxPerTableInput.value) || 10;
+        const totalTables = parseInt(totalTablesInput.value) || 20;
+
+        const result = OverflowChecker.checkAndFix(guestData, maxPerTable, totalTables);
+
+        if (result.hasOverflow) {
+            // Show warning with details
+            const changesHtml = OverflowChecker.formatChanges(result.changes);
+            
+            let statusHtml = `<div class="status-message status-info">
+                ${changesHtml}
+                <div style="margin-top: 1rem; display: flex; gap: 0.75rem;">
+                    <button class="btn-primary" id="accept-fix-btn" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                        ✅ Chấp nhận sửa đổi
+                    </button>
+                    <button class="btn-secondary" id="ignore-fix-btn" style="font-size: 0.85rem; padding: 0.5rem 1rem; background: var(--text-muted);">
+                        ❌ Bỏ qua
+                    </button>
+                </div>
+            </div>`;
+
+            uploadStatus.innerHTML = statusHtml;
+
+            // Handle accept
+            document.getElementById('accept-fix-btn').addEventListener('click', () => {
+                guestData = result.fixedGuests;
+                
+                // Update total tables if new tables were created
+                if (result.newTotalTables > totalTables) {
+                    totalTablesInput.value = result.newTotalTables;
+                    tableConfig.totalTables = result.newTotalTables;
+                }
+
+                renderPreview();
+                showStatus(uploadStatus, 'success', 
+                    `✅ Đã sửa đổi! Tổng số bàn cập nhật: ${result.newTotalTables}. Vui lòng kiểm tra lại danh sách.`);
+            });
+
+            // Handle ignore
+            document.getElementById('ignore-fix-btn').addEventListener('click', () => {
+                showStatus(uploadStatus, 'info', 
+                    '⚠️ Giữ nguyên phân bổ gốc. Một số bàn có thể vượt quá số lượng cho phép.');
+            });
+        }
+    }
+
+    // Re-run overflow check when max-per-table changes
+    maxPerTableInput.addEventListener('change', () => {
+        if (guestData.length > 0) {
+            runOverflowCheck();
+        }
+    });
 
     // ============ TABLE CONFIGURATION ============
 
@@ -159,11 +214,21 @@
             return;
         }
 
+        // Final overflow validation before push
+        const maxPerTable = parseInt(maxPerTableInput.value) || 10;
+        const issues = OverflowChecker.validate(guestData, maxPerTable);
+        if (issues.length > 0) {
+            const tableList = issues.map(i => `Bàn ${i.table} (${i.totalPeople}/${i.maxAllowed})`).join(', ');
+            const proceed = confirm(
+                `⚠️ Cảnh báo: Các bàn sau vượt quá giới hạn:\n${tableList}\n\nBạn có muốn tiếp tục đẩy dữ liệu?`
+            );
+            if (!proceed) return;
+        }
+
         pushToSheetsBtn.disabled = true;
         pushToSheetsBtn.textContent = '⏳ Đang đẩy dữ liệu...';
 
         try {
-            // Update table config from current form values
             tableConfig = {
                 totalTables: parseInt(totalTablesInput.value) || 20,
                 gridRows: parseInt(gridRowsInput.value) || 4,
@@ -196,7 +261,6 @@
 
         qrCode.innerHTML = '';
         
-        // Generate QR code using qrcodejs library
         try {
             new QRCode(qrCode, {
                 text: guestUrl,
@@ -214,7 +278,6 @@
         }
     });
 
-    // Download QR
     downloadQrBtn.addEventListener('click', () => {
         const canvas = qrCode.querySelector('canvas');
         const img = qrCode.querySelector('img');

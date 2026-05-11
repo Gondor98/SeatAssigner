@@ -727,3 +727,23 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* ============ OVERFLOW REPORT ============ */
+.overflow-report {
+    text-align: left;
+}
+
+.overflow-report ul {
+    margin: 0.5rem 0;
+    padding-left: 1.25rem;
+}
+
+.overflow-report li {
+    margin-bottom: 0.4rem;
+    line-height: 1.5;
+}
+
+.overflow-report li li {
+    font-size: 0.85rem;
+    color: var(--terracotta-dark);
+}
