@@ -50,17 +50,28 @@ const SheetsAPI = {
      * Combined into one flow so OAuth only triggers once
      */
     async pushAllData(guests, config) {
+        console.log('[SheetsAPI] Starting pushAllData...');
+        
         const token = await this._getAccessToken();
+        console.log('[SheetsAPI] Got access token:', token ? 'yes' : 'no');
 
         // 1. Write GuestList
+        console.log('[SheetsAPI] Clearing GuestList...');
+        await this._clearSheet(CONFIG.SHEETS.GUEST_LIST, token);
+        
+        console.log('[SheetsAPI] Writing GuestList...');
         const guestValues = [
             ['Họ tên', 'Số người đi', 'Bàn'],
             ...guests.map(g => [g.name, g.partySize, g.table])
         ];
-        await this._clearSheet(CONFIG.SHEETS.GUEST_LIST, token);
         await this._writeSheet(CONFIG.SHEETS.GUEST_LIST, guestValues, token);
+        console.log('[SheetsAPI] GuestList written successfully');
 
         // 2. Write TableConfig
+        console.log('[SheetsAPI] Clearing TableConfig...');
+        await this._clearSheet(CONFIG.SHEETS.TABLE_CONFIG, token);
+        
+        console.log('[SheetsAPI] Writing TableConfig...');
         const configValues = [
             ['key', 'value'],
             ['total_tables', config.totalTables],
@@ -68,38 +79,50 @@ const SheetsAPI = {
             ['grid_cols', config.gridCols],
             ['max_per_table', config.maxPerTable]
         ];
-        await this._clearSheet(CONFIG.SHEETS.TABLE_CONFIG, token);
         await this._writeSheet(CONFIG.SHEETS.TABLE_CONFIG, configValues, token);
+        console.log('[SheetsAPI] TableConfig written successfully');
 
         return { guestCount: guests.length, configWritten: true };
     },
 
     /**
      * Get OAuth access token using Google Identity Services
-     * Returns cached token if available
      */
     _getAccessToken() {
         return new Promise((resolve, reject) => {
             // Return cached token if we have one
             if (this.accessToken) {
+                console.log('[SheetsAPI] Using cached token');
                 resolve(this.accessToken);
                 return;
             }
 
-            this.tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CONFIG.CLIENT_ID,
-                scope: CONFIG.SCOPES,
-                callback: (response) => {
-                    if (response.error) {
-                        reject(new Error(response.error));
-                        return;
-                    }
-                    this.accessToken = response.access_token;
-                    resolve(this.accessToken);
-                }
-            });
+            console.log('[SheetsAPI] Requesting new access token...');
 
-            this.tokenClient.requestAccessToken({ prompt: '' });
+            try {
+                this.tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: CONFIG.CLIENT_ID,
+                    scope: CONFIG.SCOPES,
+                    callback: (response) => {
+                        console.log('[SheetsAPI] Token callback received:', response.error || 'success');
+                        if (response.error) {
+                            reject(new Error(`OAuth error: ${response.error}`));
+                            return;
+                        }
+                        this.accessToken = response.access_token;
+                        resolve(this.accessToken);
+                    },
+                    error_callback: (error) => {
+                        console.error('[SheetsAPI] Token error_callback:', error);
+                        reject(new Error(`OAuth failed: ${JSON.stringify(error)}`));
+                    }
+                });
+
+                this.tokenClient.requestAccessToken({ prompt: 'consent' });
+            } catch (err) {
+                console.error('[SheetsAPI] Failed to init token client:', err);
+                reject(err);
+            }
         });
     },
 
@@ -119,8 +142,10 @@ const SheetsAPI = {
 
         if (!response.ok) {
             const err = await response.text();
+            console.error(`[SheetsAPI] Clear ${sheetName} failed:`, err);
             throw new Error(`Clear ${sheetName} failed: ${err}`);
         }
+        console.log(`[SheetsAPI] Clear ${sheetName} OK`);
     },
 
     /**
@@ -140,9 +165,10 @@ const SheetsAPI = {
 
         if (!response.ok) {
             const err = await response.text();
+            console.error(`[SheetsAPI] Write ${sheetName} failed:`, err);
             throw new Error(`Write ${sheetName} failed: ${err}`);
         }
-
+        console.log(`[SheetsAPI] Write ${sheetName} OK`);
         return await response.json();
     },
 
