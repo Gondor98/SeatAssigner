@@ -191,36 +191,44 @@
         if (guestUrl.includes('YOUR_GITHUB_USERNAME')) {
             showStatus(deployStatus, 'info', 
                 '⚠️ Chưa cập nhật URL trang khách. Vui lòng cập nhật GUEST_PAGE_URL trong js/config.js');
+            return;
         }
 
         qrCode.innerHTML = '';
         
-        // Generate QR code
-        QRCode.toCanvas(document.createElement('canvas'), guestUrl, {
-            width: 280,
-            margin: 2,
-            color: {
-                dark: '#3D2C2E',
-                light: '#FFFDF5'
-            }
-        }, (error, canvas) => {
-            if (error) {
-                showStatus(deployStatus, 'error', `❌ Lỗi tạo QR: ${error.message}`);
-                return;
-            }
-            qrCode.appendChild(canvas);
+        // Generate QR code using qrcodejs library
+        try {
+            new QRCode(qrCode, {
+                text: guestUrl,
+                width: 280,
+                height: 280,
+                colorDark: '#3D2C2E',
+                colorLight: '#FFFDF5',
+                correctLevel: QRCode.CorrectLevel.H
+            });
             qrDisplay.style.display = 'block';
-        });
+            showStatus(deployStatus, 'success', '✅ Đã tạo mã QR thành công!');
+        } catch (error) {
+            console.error('QR generation error:', error);
+            showStatus(deployStatus, 'error', `❌ Lỗi tạo QR: ${error.message}`);
+        }
     });
 
     // Download QR
     downloadQrBtn.addEventListener('click', () => {
         const canvas = qrCode.querySelector('canvas');
-        if (!canvas) return;
-
+        const img = qrCode.querySelector('img');
+        
         const link = document.createElement('a');
         link.download = 'wedding-seat-qr.png';
-        link.href = canvas.toDataURL('image/png');
+        
+        if (canvas) {
+            link.href = canvas.toDataURL('image/png');
+        } else if (img) {
+            link.href = img.src;
+        } else {
+            return;
+        }
         link.click();
     });
 
