@@ -171,8 +171,7 @@
                 maxPerTable: parseInt(maxPerTableInput.value) || 10
             };
 
-            await SheetsAPI.writeGuestList(guestData);
-            await SheetsAPI.writeTableConfig(tableConfig);
+            const result = await SheetsAPI.pushAllData(guestData, tableConfig);
 
             showStatus(deployStatus, 'success', '✅ Đã đẩy dữ liệu lên Google Sheets thành công!');
         } catch (err) {
