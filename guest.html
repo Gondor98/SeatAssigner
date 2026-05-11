@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tìm chỗ ngồi - Wedding Seat Assigner</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lora:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body class="guest-page">
+    <header class="page-header">
+        <h1>💒 Tìm chỗ ngồi</h1>
+        <span id="event-name" style="font-family: 'Lora', serif; color: var(--text-muted);"></span>
+    </header>
+
+    <div class="guest-search-container">
+        <div class="guest-welcome">
+            <h1>Xin chào quý khách!</h1>
+            <p>Vui lòng nhập tên để tìm bàn tiệc của bạn</p>
+        </div>
+
+        <div class="search-box">
+            <div class="search-input-wrapper">
+                <input
+                    type="text"
+                    id="name-input"
+                    class="search-input"
+                    placeholder="Nhập họ tên..."
+                    autocomplete="off"
+                    autofocus
+                >
+                <button class="search-btn" id="search-btn">🔍</button>
+            </div>
+
+            <!-- Suggestions -->
+            <ul class="suggestions-list" id="suggestions" style="display: none;"></ul>
+        </div>
+
+        <!-- Loading -->
+        <div class="spinner" id="loading-spinner"></div>
+
+        <!-- Result -->
+        <div class="result-container" id="result-container">
+            <div class="result-card">
+                <p class="result-name" id="result-name"></p>
+                <p class="result-table-number" id="result-table-number"></p>
+                <p class="result-table-label">Số bàn của bạn</p>
+
+                <!-- Mini Table Map -->
+                <div id="guest-table-map" style="margin-top: 1rem;"></div>
+            </div>
+        </div>
+
+        <!-- Not Found -->
+        <div class="result-container" id="not-found-container">
+            <div class="card" style="text-align: center;">
+                <p style="font-size: 2rem; margin-bottom: 0.5rem;">😔</p>
+                <p style="color: var(--text-secondary);">
+                    Không tìm thấy tên trong danh sách.<br>
+                    Vui lòng kiểm tra lại hoặc liên hệ cô dâu/chú rể.
+                </p>
+                <button class="btn-primary" id="retry-btn" style="margin-top: 1rem;">
+                    🔄 Thử lại
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Libraries -->
+    <script src="js/config.js"></script>
+    <script src="js/sheets-api.js"></script>
+    <script src="js/name-matcher.js"></script>
+    <script src="js/table-renderer.js"></script>
+    <script src="js/guest.js"></script>
+</body>
+</html>

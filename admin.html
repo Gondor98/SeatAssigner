@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý - Wedding Seat Assigner</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lora:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="page-header">
+        <h1>🌿 Quản lý chỗ ngồi</h1>
+        <a href="index.html">← Trang chủ</a>
+    </header>
+
+    <div class="container">
+        <!-- Step 1: Upload Excel -->
+        <div class="card" id="upload-section">
+            <h2 class="card-title">📋 Bước 1: Tải danh sách khách mời</h2>
+            <div class="file-upload-area" id="file-drop-area">
+                <div class="file-upload-icon">📁</div>
+                <p class="file-upload-text">
+                    Kéo thả file Excel vào đây hoặc <strong>nhấn để chọn file</strong>
+                </p>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+                    Hỗ trợ: .xlsx (theo mẫu: Họ tên | Số người đi | Bàn)
+                </p>
+                <input type="file" id="file-input" accept=".xlsx,.xls" style="display: none;">
+            </div>
+            <div id="upload-status"></div>
+
+            <!-- Data Preview -->
+            <div id="data-preview" style="display: none; margin-top: 1.5rem;">
+                <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--olive-dark);">
+                    Xem trước dữ liệu (<span id="guest-count">0</span> khách mời)
+                </h3>
+                <div style="overflow-x: auto; max-height: 300px; overflow-y: auto;">
+                    <table class="data-table" id="preview-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Họ tên</th>
+                                <th>Số người</th>
+                                <th>Bàn</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Table Configuration -->
+        <div class="card" id="config-section">
+            <h2 class="card-title">🪑 Bước 2: Cấu hình bàn tiệc</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="total-tables">Tổng số bàn</label>
+                    <input type="number" id="total-tables" class="form-control" min="1" max="100" value="20">
+                </div>
+                <div class="form-group">
+                    <label for="grid-rows">Số hàng</label>
+                    <input type="number" id="grid-rows" class="form-control" min="1" max="20" value="4">
+                </div>
+                <div class="form-group">
+                    <label for="grid-cols">Số cột</label>
+                    <input type="number" id="grid-cols" class="form-control" min="1" max="20" value="5">
+                </div>
+                <div class="form-group">
+                    <label for="max-per-table">Số khách tối đa/bàn</label>
+                    <input type="number" id="max-per-table" class="form-control" min="1" max="20" value="10">
+                </div>
+            </div>
+            <button class="btn-secondary" id="preview-layout-btn" style="margin-top: 0.5rem;">
+                👁️ Xem trước bố trí
+            </button>
+
+            <!-- Layout Preview -->
+            <div id="layout-preview" style="margin-top: 1.5rem; display: none;">
+                <div class="stage-marker">🎤 SÂN KHẤU</div>
+                <div class="table-map" id="table-map-preview"></div>
+            </div>
+        </div>
+
+        <!-- Step 3: Push to Cloud & Generate QR -->
+        <div class="card" id="deploy-section">
+            <h2 class="card-title">☁️ Bước 3: Đẩy lên Cloud & Tạo mã QR</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                Đẩy dữ liệu lên Google Sheets và tạo mã QR để khách mời quét tìm chỗ ngồi.
+            </p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button class="btn-primary" id="push-to-sheets-btn">
+                    ☁️ Đẩy lên Google Sheets
+                </button>
+                <button class="btn-secondary" id="generate-qr-btn">
+                    📱 Tạo mã QR
+                </button>
+            </div>
+            <div id="deploy-status"></div>
+
+            <!-- QR Code Display -->
+            <div id="qr-display" class="qr-container" style="display: none;">
+                <div id="qr-code"></div>
+                <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                    Quét mã QR để mở trang tìm chỗ ngồi
+                </p>
+                <button class="btn-primary" id="download-qr-btn" style="margin-top: 1rem;">
+                    ⬇️ Tải mã QR
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Libraries -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/sheets-api.js"></script>
+    <script src="js/table-renderer.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
